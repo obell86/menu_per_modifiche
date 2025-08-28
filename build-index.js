@@ -105,8 +105,7 @@ async function buildIndex() {
 
 buildIndex();// build-index.js (Basato sul tuo script funzionante)
 
-const fetch = require('node-fetch');
-const fs = require('fs');
+
 
 // --- Configurazione Airtable (NUOVE CHIAVI USATE IN MODO SICURO) ---
 const AIRTABLE_BASE_ID = 'appGnw9kTGPSj9F59';
