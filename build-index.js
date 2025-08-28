@@ -1,15 +1,15 @@
-// build-index.js (Versione Corretta senza duplicati)
+// build-index.js (Versione Corretta e Definitiva)
 
 const fetch = require('node-fetch');
 const fs = require('fs');
 
-// --- Configurazione Airtable (NUOVE CHIAVI USATE IN MODO SICURO) ---
+// --- Configurazione Airtable ---
 const AIRTABLE_BASE_ID = 'appGnw9kTGPSj9F59';
 const AIRTABLE_PAT = process.env.AIRTABLE_PAT_KEY;
 const CONFIG_TABLE_NAME = 'Configurazione';
 const LINKS_TABLE_NAME = 'Links';
 
-// --- Mappatura Campi (dal tuo script) ---
+// --- Mappatura Campi ---
 const fieldMap = {
     config: {
         title: 'Titolo Pagina', logoUrl: 'Logo', backgroundUrl: 'Sfondo', linkedLinks: 'Link Attivi'
@@ -18,7 +18,7 @@ const fieldMap = {
 };
 const defaultBackgroundTexture = "url('https://www.transparenttextures.com/patterns/dark-wood.png')";
 
-// --- Funzioni Helper (dal tuo script) ---
+// --- Funzioni Helper ---
 const getField = (fields, fieldName, defaultValue = null) => { if (!fields) return defaultValue; const value = fields[fieldName]; return (value !== undefined && value !== null && value !== '') ? value : defaultValue; };
 const getAttachmentUrl = (fields, fieldName) => { const attach = getField(fields, fieldName); if (Array.isArray(attach) && attach.length > 0) { const first = attach[0]; if (first.thumbnails && first.thumbnails.large) { return first.thumbnails.large.url; } return first.url; } return null; };
 
@@ -29,14 +29,12 @@ async function buildIndex() {
     try {
         const headers = { Authorization: `Bearer ${AIRTABLE_PAT}` };
         
-        // 1. Recupera Configurazione
         const configUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(CONFIG_TABLE_NAME)}?maxRecords=1`;
         const configResponse = await fetch(configUrl, { headers });
         if (!configResponse.ok) throw new Error(`API Config Error: ${await configResponse.text()}`);
         const configResult = await configResponse.json();
         const configFields = configResult.records[0].fields;
 
-        // 2. Prepara lo sfondo (logica dal tuo script)
         let videoSrc = '';
         let videoDisplay = 'none';
         let containerStyle = `background-image: ${defaultBackgroundTexture}; background-repeat: repeat;`;
@@ -55,7 +53,6 @@ async function buildIndex() {
             }
         }
 
-        // 3. Recupera e Prepara i Link
         const linkedLinkIds = getField(configFields, fieldMap.config.linkedLinks, []);
         let linksHTML = '';
         if (linkedLinkIds.length > 0) {
@@ -79,12 +76,10 @@ async function buildIndex() {
         }
         if (!linksHTML) linksHTML = '<p>Nessun link disponibile.</p>';
 
-        // 4. Prepara altri dati
         const logoUrl = getAttachmentUrl(configFields, fieldMap.config.logoUrl);
         const logoHTML = logoUrl ? `<img src="${logoUrl}" alt="Logo">` : '';
         const pageTitle = getField(configFields, fieldMap.config.title, 'Benvenuti');
         
-        // 5. Applica tutto al template
         const template = fs.readFileSync('index.template.html', 'utf-8');
         const finalHTML = template
             .replace('<!-- PAGE_TITLE_PLACEHOLDER -->', pageTitle)
@@ -95,7 +90,7 @@ async function buildIndex() {
             .replace('<!-- VIDEO_DISPLAY_PLACEHOLDER -->', videoDisplay);
 
         fs.writeFileSync('index.html', finalHTML);
-        console.log("Build index.html completata con successo (con logica sfondo originale)!");
+        console.log("Build index.html completata con successo!");
 
     } catch (error) {
         console.error('ERRORE build index:', error);
