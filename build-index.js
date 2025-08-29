@@ -90,7 +90,7 @@ async function buildIndex() {
             .replace('<!-- VIDEO_DISPLAY_PLACEHOLDER -->', videoDisplay);
 
         fs.writeFileSync('index.html', finalHTML);
-        console.log("Build index.html completata con successo!");
+        console.log("Build index.html completata con successo (con logica sfondo originale)!");
 
     } catch (error) {
         console.error('ERRORE build index:', error);
