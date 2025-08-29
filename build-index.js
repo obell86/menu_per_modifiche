@@ -1,10 +1,10 @@
-// build-index.js (Traduzione completa dello script originale)
+// build-index.js (MODIFICATO PER USARE FILE LOCALI DA /assets)
 
 const fetch = require('node-fetch');
 const fs = require('fs');
 
 // --- Configurazione Airtable ---
-const AIRTABLE_BASE_ID = 'appGnw9kTGPSj9F59'; // NUOVO ID BASE
+const AIRTABLE_BASE_ID = 'appvjKQemc2HLdvtc'; // ID BASE CORRETTO
 const AIRTABLE_PAT = process.env.AIRTABLE_PAT_KEY;
 const CONFIG_TABLE_NAME = 'Configurazione';
 const LINKS_TABLE_NAME = 'Links';
@@ -25,7 +25,6 @@ const defaultBackgroundTexture = "url('https://www.transparenttextures.com/patte
 
 // --- Funzioni Helper ---
 const getField = (fields, fieldName, defaultValue = null) => { if (!fields) return defaultValue; const value = fields[fieldName]; return (value !== undefined && value !== null && value !== '') ? value : defaultValue; };
-const getAttachmentUrl = (fields, fieldName) => { const attach = getField(fields, fieldName); if (Array.isArray(attach) && attach.length > 0) { const first = attach[0]; if (first.thumbnails && first.thumbnails.large) { return first.thumbnails.large.url; } return first.url; } return null; };
 
 async function buildIndex() {
     console.log("Inizio build completa della pagina principale...");
@@ -43,30 +42,31 @@ async function buildIndex() {
 
         // --- PREPARAZIONE DATI PER IL TEMPLATE ---
 
-        // 1. Sfondo
+        // 1. Sfondo (LOGICA CORRETTA PER FILE LOCALI)
         let videoSrc = '', videoDisplay = 'none', containerStyle = `background-image: ${defaultBackgroundTexture}; background-repeat: repeat;`;
-        const bgAttach = getField(configFields, fieldMap.config.backgroundUrl);
-        if (Array.isArray(bgAttach) && bgAttach.length > 0) {
-            const first = bgAttach[0];
-            if (first.type && first.url) {
-                if (first.type.startsWith('video/')) {
-                    videoSrc = first.url; videoDisplay = 'block'; containerStyle = 'background-color: #3a2d27;';
-                } else if (first.type.startsWith('image/')) {
-                    containerStyle = `background-image: url('${getAttachmentUrl(configFields, fieldMap.config.backgroundUrl)}'); background-size: cover; background-position: center center; background-repeat: no-repeat;`;
-                }
+        const backgroundFilename = getField(configFields, fieldMap.config.backgroundUrl);
+        if (backgroundFilename) {
+            const backgroundPath = `/assets/${backgroundFilename}`; // CORREZIONE: Aggiunto /assets/
+            if (backgroundFilename.endsWith('.mp4') || backgroundFilename.endsWith('.webm')) {
+                videoSrc = backgroundPath;
+                videoDisplay = 'block';
+                containerStyle = 'background-color: #3a2d27;';
+            } else {
+                containerStyle = `background-image: url('${backgroundPath}'); background-size: cover; background-position: center center; background-repeat: no-repeat;`;
             }
         }
-
+        
         // 2. Titolo
         const pageTitle = getField(configFields, fieldMap.config.title, 'Benvenuti');
         const titleSize = getField(configFields, fieldMap.config.titleSize, '');
         const titleStyle = titleSize ? `style="font-size: ${titleSize};"` : '';
 
-        // 3. Logo
-        const logoUrl = getAttachmentUrl(configFields, fieldMap.config.logoUrl);
+        // 3. Logo (LOGICA CORRETTA PER FILE LOCALI)
+        const logoFilename = getField(configFields, fieldMap.config.logoUrl);
+        const logoUrl = logoFilename ? `/assets/${logoFilename}` : null; // CORREZIONE: Aggiunto /assets/
         const logoHTML = logoUrl ? `<img src="${logoUrl}" alt="Logo">` : '';
 
-        // 4. Countdown
+        // 4. Countdown (Logica Invariata)
         const showCountdown = getField(configFields, fieldMap.config.showCountdown, false);
         const countdownTarget = getField(configFields, fieldMap.config.countdownTarget);
         const countdownLabel = getField(configFields, fieldMap.config.countdownLabel, '');
@@ -82,7 +82,7 @@ async function buildIndex() {
                 </div>`;
         }
         
-        // 5. Loader
+        // 5. Loader (Logica Invariata)
         const showLoader = getField(configFields, fieldMap.config.showLoader, false);
         const loaderText = getField(configFields, fieldMap.config.loaderText, 'Caricamento...');
         let loaderHTML = '';
@@ -90,7 +90,7 @@ async function buildIndex() {
             loaderHTML = `<div class="loader-container" id="loader"><div class="loader-bar"></div><span id="loading-text-container">${loaderText}</span></div>`;
         }
 
-        // 6. Link
+        // 6. Link (Logica Invariata)
         const linkedLinkIds = getField(configFields, fieldMap.config.linkedLinks, []);
         let linksHTML = '';
         if (linkedLinkIds.length > 0) {
@@ -112,8 +112,8 @@ async function buildIndex() {
         }
         if (!linksHTML) linksHTML = '<p>Nessun link disponibile.</p>';
         
-        // 7. Immagine Footer
-        const footerImageUrl = getAttachmentUrl(configFields, fieldMap.config.footerImageUrl);
+        // 7. Immagine Footer (Logica Invariata - Lasciata come Attachment)
+        const footerImageUrl = configFields.footerImageUrl ? configFields.footerImageUrl[0].url : null;
         const footerImageAlt = getField(configFields, fieldMap.config.footerImageAlt, '');
         const footerImageHTML = footerImageUrl ? `<img src="${footerImageUrl}" alt="${footerImageAlt}">` : '';
 
@@ -132,7 +132,7 @@ async function buildIndex() {
             .replace('<!-- VIDEO_DISPLAY_PLACEHOLDER -->', videoDisplay);
 
         fs.writeFileSync('index.html', finalHTML);
-        console.log("Build index.html completata con TUTTA la logica originale!");
+        console.log("Build index.html completata con file locali per logo e sfondo!");
 
     } catch (error) {
         console.error('ERRORE build index:', error);
