@@ -107,7 +107,7 @@ body.error-page h1{color:#ff8a80;animation:none;text-shadow:none}
     border:1px solid rgba(0,0,0,.2); 
     
     /* --- MODIFICHE APPLICATE QUI --- */
-    background-color: ##5a9e00; /* Il tuo nuovo colore verde scuro */
+    background-color: #5a9e00; /* Il tuo nuovo colore verde scuro */
     background-image: url("https://www.transparenttextures.com/patterns/crisp-paper-ruffles.png"); /* La tua nuova trama */
     color: #f0f0f0; /* Testo bianco/grigio chiaro per leggibilità */
     /* --- FINE MODIFICHE --- */
