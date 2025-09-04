@@ -6,15 +6,27 @@
     <!-- Titolo della pagina specifica del menu -->
     <title>Il Nostro Menu</title>
 
-    <!-- === FONT === -->
-    <!-- Assicurati che siano gli stessi font usati in index.html e style.css -->
+    <!-- === VECCHI FONT (LASCIATI PER SICUREZZA) === -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-    <!-- === FINE FONT === -->
+    
+    <!-- === NUOVO FONT ROBOTO MONO AGGIUNTO QUI === -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 
     <!-- Link allo STESSO foglio di stile CSS della pagina principale -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- === STILE AGGIUNTIVO PER APPLICARE ROBOTO MONO SOLO A QUESTA PAGINA === -->
+    <style>
+        .menu-page-container {
+            font-family: "Roboto Mono", monospace;
+        }
+        /* Opzionale: Rende i titoli delle categorie un po' più spessi */
+        .category-title {
+            font-weight: 700;
+        }
+    </style>
     
 </head>
 <body>
